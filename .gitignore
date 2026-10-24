@@ -1,0 +1,24 @@
+﻿# Сборка и временные файлы
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+# Логи
+*.log
+
+# Локальная база данных и временные файлы SQLite
+AutoRent.db
+AutoRent.db-shm
+AutoRent.db-wal
+
+# Секреты и локальные настройки
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+
+# Системные файлы Windows
+Thumbs.db
+Desktop.ini

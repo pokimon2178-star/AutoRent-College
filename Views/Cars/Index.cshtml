@@ -1,0 +1,111 @@
+@model IEnumerable<AutoRent.Models.Car>
+
+@{
+    ViewData["Title"] = "Каталог автомобилей";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4">@ViewData["Title"]</h1>
+
+    <!-- Фильтры -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Фильтры</h5>
+        </div>
+        <div class="card-body">
+            <form id="filterForm">
+                <div class="row g-3">
+                    <!-- Поиск -->
+                    <div class="col-md-6 col-lg-3">
+                        <label for="search" class="form-label">Поиск</label>
+                        <input type="text" class="form-control" id="search" name="search"
+                               placeholder="Марка или модель" value="@ViewBag.CurrentSearch">
+                    </div>
+
+                    <!-- Бренд -->
+                    <div class="col-md-6 col-lg-3">
+                        <label for="brandId" class="form-label">Бренд</label>
+                        <select class="form-select" id="brandId" name="brandId">
+                            <option value="">Все бренды</option>
+                            @foreach (var brand in ViewBag.Brands)
+                            {
+                                <option value="@brand.Id" selected="@(brand.Id == ViewBag.CurrentBrandId)">
+                                    @brand.Name
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Категория -->
+                    <div class="col-md-6 col-lg-3">
+                        <label for="categoryId" class="form-label">Категория</label>
+                        <select class="form-select" id="categoryId" name="categoryId">
+                            <option value="">Все категории</option>
+                            @foreach (var category in ViewBag.Categories)
+                            {
+                                <option value="@category.Id" selected="@(category.Id == ViewBag.CurrentCategoryId)">
+                                    @category.Name
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Коробка передач -->
+                    <div class="col-md-6 col-lg-3">
+                        <label for="transmission" class="form-label">Коробка передач</label>
+                        <select class="form-select" id="transmission" name="transmission">
+                            <option value="">Все типы</option>
+                            @foreach (var trans in ViewBag.Transmissions)
+                            {
+                                <option value="@trans" selected="@(trans == ViewBag.CurrentTransmission)">
+                                    @trans
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Минимальная цена -->
+                    <div class="col-md-6 col-lg-2">
+                        <label for="minPrice" class="form-label">Мин. цена</label>
+                        <input type="number" class="form-control" id="minPrice" name="minPrice"
+                               placeholder="От" min="0" step="100" value="@ViewBag.CurrentMinPrice">
+                    </div>
+
+                    <!-- Максимальная цена -->
+                    <div class="col-md-6 col-lg-2">
+                        <label for="maxPrice" class="form-label">Макс. цена</label>
+                        <input type="number" class="form-control" id="maxPrice" name="maxPrice"
+                               placeholder="До" min="0" step="100" value="@ViewBag.CurrentMaxPrice">
+                    </div>
+
+                    <!-- Сортировка -->
+                    <div class="col-md-6 col-lg-3">
+                        <label for="sortBy" class="form-label">Сортировка</label>
+                        <select class="form-select" id="sortBy" name="sortBy">
+                            <option value="" selected="@(string.IsNullOrEmpty(ViewBag.CurrentSortBy))">По умолчанию</option>
+                            <option value="price_asc" selected="@(ViewBag.CurrentSortBy == "price_asc")">Цена: по возрастанию</option>
+                            <option value="price_desc" selected="@(ViewBag.CurrentSortBy == "price_desc")">Цена: по убыванию</option>
+                            <option value="name_asc" selected="@(ViewBag.CurrentSortBy == "name_asc")">Название: А-Я</option>
+                            <option value="name_desc" selected="@(ViewBag.CurrentSortBy == "name_desc")">Название: Я-А</option>
+                        </select>
+                    </div>
+
+                    <!-- Кнопки -->
+                    <div class="col-md-6 col-lg-5 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">Применить</button>
+                        <button type="button" class="btn btn-secondary" id="resetFilters">Сбросить</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Список автомобилей -->
+    <div id="carsContainer">
+        @await Html.PartialAsync("_CarsListPartial", Model)
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/cars-filter.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,25 @@
+@{
+    ViewData["Title"] = "Доступ запрещён";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-warning shadow">
+                <div class="card-body text-center p-5">
+                    <i class="bi bi-exclamation-triangle text-warning" style="font-size: 5rem;"></i>
+                    <h1 class="mt-4 mb-3">Доступ запрещён</h1>
+                    <p class="lead">У вас нет прав для доступа к этой странице</p>
+                    <p class="text-muted">
+                        Если вы считаете, что это ошибка, пожалуйста, свяжитесь с администратором
+                    </p>
+                    <div class="mt-4">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                            <i class="bi bi-house-door me-2"></i>Вернуться на главную
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
