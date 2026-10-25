@@ -1,0 +1,114 @@
+@model AutoRent.Models.ViewModels.CreateBookingViewModel
+
+@{
+    ViewData["Title"] = "Бронирование автомобиля";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4">@ViewData["Title"]</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">@Model.CarName</h5>
+                    <p class="card-text">
+                        <strong>Цена в день:</strong> @Model.PricePerDay.ToString("C")
+                    </p>
+
+                    <form method="post" asp-action="Create">
+                        <input type="hidden" asp-for="CarId" />
+
+                        <div class="mb-3">
+                            <label asp-for="StartDate" class="form-label">Дата начала</label>
+                            <input type="date" asp-for="StartDate" class="form-control" required />
+                            <span asp-validation-for="StartDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="EndDate" class="form-label">Дата окончания</label>
+                            <input type="date" asp-for="EndDate" class="form-control" required />
+                            <span asp-validation-for="EndDate" class="text-danger"></span>
+                        </div>
+
+                        @if (Model.CalculatedTotalPrice > 0)
+                        {
+                            <div class="alert alert-info">
+                                <strong>Количество дней:</strong> @((Model.EndDate - Model.StartDate).Days)<br />
+                                <strong>Общая стоимость:</strong> @Model.CalculatedTotalPrice.ToString("C")
+                            </div>
+                        }
+
+                        <div class="mb-3">
+                            <button type="submit" class="btn btn-primary">Перейти к оплате</button>
+                            <a href="@Url.Action("Index", "Cars")" class="btn btn-secondary">Отмена</a>
+                        </div>
+                    </form>
+
+                    @if (ViewBag.ErrorMessage != null)
+                    {
+                        <div class="alert alert-danger">
+                            @ViewBag.ErrorMessage
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Важная информация</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="small">
+                        <li>Минимальная длительность аренды: 1 день</li>
+                        <li>Максимальная длительность аренды: 90 дней</li>
+                        <li>Дата начала не может быть в прошлом</li>
+                        <li>Проверьте доступность автомобиля на выбранные даты</li>
+                        <li>После бронирования вам потребуется оплата</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script nonce="@Context.Items["CspNonce"]">
+        document.addEventListener('DOMContentLoaded', function () {
+            const startDateInput = document.querySelector('input[name="StartDate"]');
+            const endDateInput = document.querySelector('input[name="EndDate"]');
+
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            startDateInput.min = today;
+            endDateInput.min = today;
+
+            // Update end date minimum when start date changes
+            startDateInput.addEventListener('change', function () {
+                const startDate = new Date(this.value);
+                startDate.setDate(startDate.getDate() + 1);
+                endDateInput.min = startDate.toISOString().split('T')[0];
+            });
+
+            // Recalculate total price when dates change
+            function updatePrice() {
+                const startDate = new Date(startDateInput.value);
+                const endDate = new Date(endDateInput.value);
+                if (startDate && endDate && endDate > startDate) {
+                    const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+                    const total = days * @Model.PricePerDay;
+                    console.log(`Days: ${days}, Total: ${total}`);
+                }
+            }
+
+            startDateInput.addEventListener('change', updatePrice);
+            endDateInput.addEventListener('change', updatePrice);
+        });
+    </script>
+}

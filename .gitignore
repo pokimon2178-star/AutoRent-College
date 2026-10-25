@@ -2,6 +2,7 @@
 bin/
 obj/
 .vs/
+.keys/
 *.user
 *.suo
 

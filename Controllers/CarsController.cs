@@ -1,6 +1,7 @@
 using AutoRent.Data;
 using AutoRent.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 namespace AutoRent.Controllers;
@@ -43,10 +44,10 @@ public class CarsController : Controller
         // Применение фильтров
         if (!string.IsNullOrWhiteSpace(search))
         {
-            var searchLower = search.ToLower();
+            var searchPattern = $"%{EscapeLikePattern(search.Trim())}%";
             query = query.Where(c =>
-                c.Model.ToLower().Contains(searchLower) ||
-                c.Brand.Name.ToLower().Contains(searchLower));
+                EF.Functions.Like(c.Model, searchPattern, "\\") ||
+                EF.Functions.Like(c.Brand.Name, searchPattern, "\\"));
         }
 
         if (brandId.HasValue)
@@ -77,8 +78,8 @@ public class CarsController : Controller
         // Сортировка
         query = sortBy switch
         {
-            "price_asc" => query.OrderBy(c => c.PricePerDay),
-            "price_desc" => query.OrderByDescending(c => c.PricePerDay),
+            "price_asc" => query.OrderBy(c => (double)c.PricePerDay),
+            "price_desc" => query.OrderByDescending(c => (double)c.PricePerDay),
             "name_asc" => query.OrderBy(c => c.Brand.Name).ThenBy(c => c.Model),
             "name_desc" => query.OrderByDescending(c => c.Brand.Name).ThenByDescending(c => c.Model),
             _ => query.OrderBy(c => c.Brand.Name).ThenBy(c => c.Model)
@@ -134,10 +135,10 @@ public class CarsController : Controller
         // Применение фильтров
         if (!string.IsNullOrWhiteSpace(search))
         {
-            var searchLower = search.ToLower();
+            var searchPattern = $"%{EscapeLikePattern(search.Trim())}%";
             query = query.Where(c =>
-                c.Model.ToLower().Contains(searchLower) ||
-                c.Brand.Name.ToLower().Contains(searchLower));
+                EF.Functions.Like(c.Model, searchPattern, "\\") ||
+                EF.Functions.Like(c.Brand.Name, searchPattern, "\\"));
         }
 
         if (brandId.HasValue)
@@ -168,8 +169,8 @@ public class CarsController : Controller
         // Сортировка
         query = sortBy switch
         {
-            "price_asc" => query.OrderBy(c => c.PricePerDay),
-            "price_desc" => query.OrderByDescending(c => c.PricePerDay),
+            "price_asc" => query.OrderBy(c => (double)c.PricePerDay),
+            "price_desc" => query.OrderByDescending(c => (double)c.PricePerDay),
             "name_asc" => query.OrderBy(c => c.Brand.Name).ThenBy(c => c.Model),
             "name_desc" => query.OrderByDescending(c => c.Brand.Name).ThenByDescending(c => c.Model),
             _ => query.OrderBy(c => c.Brand.Name).ThenBy(c => c.Model)
@@ -200,4 +201,7 @@ public class CarsController : Controller
 
         return View(car);
     }
+
+    private static string EscapeLikePattern(string value) =>
+        value.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
 }

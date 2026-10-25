@@ -1,0 +1,81 @@
+@model IEnumerable<AutoRent.Models.Booking>
+
+@{
+    ViewData["Title"] = "Мои бронирования";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4">@ViewData["Title"]</h1>
+
+    @if (Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Автомобиль</th>
+                        <th>Дата начала</th>
+                        <th>Дата окончания</th>
+                        <th>Статус</th>
+                        <th>Сумма</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var booking in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (booking.Car != null)
+                                {
+                                    <strong>@booking.Car.Brand?.Name @booking.Car.Model</strong><br />
+                                    <small class="text-muted">@booking.Car.Category?.Name</small>
+                                }
+                            </td>
+                            <td>@booking.StartDate.ToString("dd.MM.yyyy")</td>
+                            <td>@booking.EndDate.ToString("dd.MM.yyyy")</td>
+                            <td>
+                                @switch (booking.Status)
+                                {
+                                    case "Pending":
+                                        <span class="badge bg-warning">Ожидание</span>
+                                        break;
+                                    case "Confirmed":
+                                        <span class="badge bg-success">Подтверждено</span>
+                                        break;
+                                    case "Cancelled":
+                                        <span class="badge bg-danger">Отменено</span>
+                                        break;
+                                    case "Completed":
+                                        <span class="badge bg-info">Завершено</span>
+                                        break;
+                                    default:
+                                        <span class="badge bg-secondary">@booking.Status</span>
+                                        break;
+                                }
+                            </td>
+                            <td>@booking.TotalPrice.ToString("C")</td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@booking.Id" class="btn btn-sm btn-info">Детали</a>
+                                @if (booking.Status == "Pending" || booking.Status == "Confirmed")
+                                {
+                                    <form method="post" asp-action="Cancel" asp-route-id="@booking.Id" style="display: inline;">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Вы уверены?')">Отмена</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>
+            У вас нет бронирований. <a asp-controller="Cars" asp-action="Index">Перейти в каталог автомобилей</a>
+        </div>
+    }
+</div>

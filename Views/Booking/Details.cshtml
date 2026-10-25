@@ -1,0 +1,147 @@
+@model AutoRent.Models.Booking
+
+@{
+    ViewData["Title"] = "Детали бронирования";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4">@ViewData["Title"]</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        Бронирование #@Model.Id
+                        @switch (Model.Status)
+                        {
+                            case "Pending":
+                                <span class="badge bg-warning float-end">Ожидание</span>
+                                break;
+                            case "Confirmed":
+                                <span class="badge bg-success float-end">Подтверждено</span>
+                                break;
+                            case "Cancelled":
+                                <span class="badge bg-danger float-end">Отменено</span>
+                                break;
+                            case "Completed":
+                                <span class="badge bg-info float-end">Завершено</span>
+                                break;
+                        }
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="mb-3">Информация об автомобиле</h6>
+                    @if (Model.Car != null)
+                    {
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p>
+                                    <strong>Марка и модель:</strong><br />
+                                    @Model.Car.Brand?.Name @Model.Car.Model
+                                </p>
+                                <p>
+                                    <strong>Категория:</strong><br />
+                                    @Model.Car.Category?.Name
+                                </p>
+                                <p>
+                                    <strong>Год выпуска:</strong><br />
+                                    @Model.Car.Year
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p>
+                                    <strong>Трансмиссия:</strong><br />
+                                    @Model.Car.Transmission
+                                </p>
+                                <p>
+                                    <strong>Тип топлива:</strong><br />
+                                    @Model.Car.FuelType
+                                </p>
+                                <p>
+                                    <strong>Количество мест:</strong><br />
+                                    @Model.Car.Seats
+                                </p>
+                            </div>
+                        </div>
+                    }
+
+                    <hr />
+
+                    <h6 class="mb-3">Информация о бронировании</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p>
+                                <strong>Дата начала:</strong><br />
+                                @Model.StartDate.ToString("dd.MM.yyyy")
+                            </p>
+                            <p>
+                                <strong>Дата окончания:</strong><br />
+                                @Model.EndDate.ToString("dd.MM.yyyy")
+                            </p>
+                            <p>
+                                <strong>Количество дней:</strong><br />
+                                @((Model.EndDate - Model.StartDate).Days)
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p>
+                                <strong>Цена за день:</strong><br />
+                                @Model.Car?.PricePerDay.ToString("C")
+                            </p>
+                            <p>
+                                <strong>Общая стоимость:</strong><br />
+                                <strong class="text-success">@Model.TotalPrice.ToString("C")</strong>
+                            </p>
+                            <p>
+                                <strong>Дата создания:</strong><br />
+                                @Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+                            </p>
+                        </div>
+                    </div>
+
+                    @if (Model.Payment != null)
+                    {
+                        <hr />
+                        <h6 class="mb-3">Информация о платеже</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p>
+                                    <strong>Статус платежа:</strong><br />
+                                    @switch (Model.Payment.Status)
+                                    {
+                                        case "Completed":
+                                            <span class="badge bg-success">Завершен</span>
+                                            break;
+                                        case "Pending":
+                                            <span class="badge bg-warning">Ожидание</span>
+                                            break;
+                                        case "Failed":
+                                            <span class="badge bg-danger">Ошибка</span>
+                                            break;
+                                    }
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p>
+                                    <strong>Сумма платежа:</strong><br />
+                                    @Model.Payment.Amount.ToString("C")
+                                </p>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="card-footer">
+                    <a asp-action="MyBookings" class="btn btn-secondary">Вернуться к бронированиям</a>
+                    @if (Model.Status == "Pending")
+                    {
+                        <form method="post" asp-action="Cancel" asp-route-id="@Model.Id" style="display: inline;">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Вы уверены?')">Отменить бронирование</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

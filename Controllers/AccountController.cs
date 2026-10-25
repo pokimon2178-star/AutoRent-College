@@ -108,6 +108,7 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model)
     {
+        ViewData["ReturnUrl"] = model.ReturnUrl;
         if (!ModelState.IsValid)
         {
             return View(model);

@@ -1,0 +1,90 @@
+@model AutoRent.Models.ViewModels.PaymentViewModel
+
+@{
+    ViewData["Title"] = "Оплата бронирования";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4">@ViewData["Title"]</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Сумма к оплате</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h6>Информация о бронировании</h6>
+                        <p>
+                            <strong>Автомобиль:</strong> @Model.CarInfo
+                        </p>
+                        <p>
+                            <strong>Период:</strong> @Model.StartDate.ToString("dd.MM.yyyy") - @Model.EndDate.ToString("dd.MM.yyyy")
+                        </p>
+                        <p>
+                            <strong>Количество дней:</strong> @Model.Days
+                        </p>
+                        <p>
+                            <strong>Сумма к оплате:</strong>
+                            <span class="text-success" style="font-size: 1.5em; font-weight: bold;">
+                                @Model.Amount.ToString("C")
+                            </span>
+                        </p>
+                    </div>
+
+                    <h6 class="mb-3">Способ оплаты</h6>
+                    <form method="post" asp-action="Process" asp-route-bookingId="@Model.BookingId">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="card" value="card" checked>
+                                <label class="form-check-label" for="card">
+                                    <i class="bi bi-credit-card"></i> Банковская карта
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>Демо-режим:</strong> оплата имитируется, деньги не списываются.
+                            <strong>Важно:</strong> В демонстрационной версии платеж обрабатывается как успешный.
+                            В production используется реальная интеграция с платежным провайдером.
+                        </div>
+
+                        <div class="mb-3">
+                            <button type="submit" class="btn btn-success btn-lg" style="width: 100%;">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Оплатить @Model.Amount.ToString("C")
+                            </button>
+                        </div>
+
+                        <div class="mb-3">
+                            <a href="@Url.Action("MyBookings", "Booking")" class="btn btn-secondary btn-lg" style="width: 100%;">
+                                Отмена
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Условия оплаты</h6>
+                </div>
+                <div class="card-body small">
+                    <ul>
+                        <li>Платеж обрабатывается безопасно</li>
+                        <li>Ваши данные защищены</li>
+                        <li>После успешной оплаты вы получите подтверждение</li>
+                        <li>Вы можете отменить бронирование до начала аренды</li>
+                        <li>Возврат средств по политике возврата</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

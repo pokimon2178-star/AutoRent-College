@@ -1,0 +1,136 @@
+@model AutoRent.Models.Payment
+
+@{
+    ViewData["Title"] = "Платеж подтвержден";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Платеж успешно обработан
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success">
+                        <strong>Демо-режим:</strong> деньги не списывались.
+                        <h6>Спасибо за бронирование!</h6>
+                        <p class="mb-0">
+                            Ваше бронирование подтверждено. Детали будут отправлены на ваш email.
+                        </p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="mb-3">Информация о платеже</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <th>ID платежа:</th>
+                                <td>@Model.Id</td>
+                            </tr>
+                            <tr>
+                                <th>Сумма:</th>
+                                <td>@Model.Amount.ToString("C")</td>
+                            </tr>
+                            <tr>
+                                <th>Статус:</th>
+                                <td>
+                                    @if (Model.Status == "Completed")
+                                    {
+                                        <span class="badge bg-success">Завершен</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">@Model.Status</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Ссылка на транзакцию:</th>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(Model.TransactionReference))
+                                    {
+                                        <code>@Model.TransactionReference</code>
+                                    }
+                                    else
+                                    {
+                                        <em class="text-muted">Не доступна</em>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Дата платежа:</th>
+                                <td>@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm:ss")</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    @if (Model.Booking != null)
+                    {
+                        <div class="mb-4">
+                            <h6 class="mb-3">Информация о бронировании</h6>
+                            <table class="table table-sm">
+                                <tr>
+                                    <th>ID бронирования:</th>
+                                    <td>#@Model.Booking.Id</td>
+                                </tr>
+                                @if (Model.Booking.Car != null)
+                                {
+                                    <tr>
+                                        <th>Автомобиль:</th>
+                                        <td>@Model.Booking.Car.Brand?.Name @Model.Booking.Car.Model</td>
+                                    </tr>
+                                }
+                                <tr>
+                                    <th>Дата начала:</th>
+                                    <td>@Model.Booking.StartDate.ToString("dd.MM.yyyy")</td>
+                                </tr>
+                                <tr>
+                                    <th>Дата окончания:</th>
+                                    <td>@Model.Booking.EndDate.ToString("dd.MM.yyyy")</td>
+                                </tr>
+                                <tr>
+                                    <th>Статус бронирования:</th>
+                                    <td>
+                                        @switch (Model.Booking.Status)
+                                        {
+                                            case "Confirmed":
+                                                <span class="badge bg-success">Подтверждено</span>
+                                                break;
+                                            default:
+                                                <span class="badge bg-info">@Model.Booking.Status</span>
+                                                break;
+                                        }
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <h6>Дальнейшие действия:</h6>
+                        <ul>
+                            <li>Проверьте вашу электронную почту для получения подтверждения</li>
+                            <li>Сохраните номер бронирования для справки</li>
+                            <li>За день до начала аренды вы получите инструкции по получению автомобиля</li>
+                            <li>Если у вас есть вопросы, свяжитесь с нашей службой поддержки</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <a asp-action="MyBookings" asp-controller="Booking" class="btn btn-primary">
+                            <i class="bi bi-arrow-left me-2"></i>
+                            Вернуться к моим бронированиям
+                        </a>
+                        <a asp-action="Index" asp-controller="Cars" class="btn btn-secondary">
+                            <i class="bi bi-car-front me-2"></i>
+                            Посмотреть другие автомобили
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
